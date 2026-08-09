@@ -1,15 +1,50 @@
 {
   "name": "harness",
   "version": "0.1.0",
-  "description": "Declarative multi-role agent harness on top of opencode",
+  "description": "Declarative multi-role agent harness on top of opencode: roles, pipelines with loops, memory, sandboxing, run tracing, evals and a measured self-improvement loop.",
+  "keywords": [
+    "opencode",
+    "ai-agents",
+    "agent-harness",
+    "multi-agent",
+    "coding-agent",
+    "orchestration",
+    "llm",
+    "local-llm",
+    "ollama",
+    "evaluation",
+    "self-improvement",
+    "devcontainer",
+    "cli",
+    "bun",
+    "typescript"
+  ],
+  "homepage": "https://github.com/Tlahey/hardess#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Tlahey/hardess.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Tlahey/hardess/issues"
+  },
+  "license": "MIT",
+  "author": "Antoine Vendeville",
   "type": "module",
   "bin": {
     "harness": "./src/cli.ts"
   },
+  "files": [
+    "src",
+    "template",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "harness": "bun run src/cli.ts",
     "build": "bun build ./src/cli.ts --compile --outfile ./dist/harness",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "schemas": "bun -e 'import {writeSchemas} from \"./src/config/jsonschema.ts\"; await writeSchemas(\"./template\")'"
   },
   "dependencies": {
     "yaml": "^2.6.1",

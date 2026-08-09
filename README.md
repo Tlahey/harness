@@ -5,12 +5,24 @@ A project template for building software with **opencode**, driven by declarativ
 evaluation, and a self-improvement loop that is actually measured.
 
 ```bash
+git clone git@github.com:Tlahey/hardess.git && cd hardess
 bun install
-bun run harness init          # scaffold, then pick a provider and models
-bun run harness sync          # generate opencode.json + system prompts
-bun run harness doctor        # opencode, endpoints, sandbox, sync state
-bun run harness pipeline run feature --input task="add a /health endpoint"
+bun link                      # `harness` becomes available everywhere
+
+harness init my-project       # scaffold, then pick a provider and models
+cd my-project
+harness sync                  # generate opencode.json + system prompts
+harness doctor                # opencode, endpoints, sandbox, sync state
+
+harness pipeline run feature --input task="add a /health endpoint" --dry-run
 ```
+
+`bun link` points the global command at your checkout, so edits to `src/` take effect
+immediately. Prefer not to link? Every command works as `bun run harness …` from the repo.
+Need a standalone binary? `bun run build` produces `dist/harness`.
+
+**New here?** [docs/getting-started.md](docs/getting-started.md) walks from an empty
+machine to a pipeline that runs, with two worked examples and a troubleshooting table.
 
 ---
 
@@ -212,6 +224,7 @@ catches "server not running" and "model unloaded" before a run burns ten minutes
 
 | Document | Contents |
 |---|---|
+| [docs/getting-started.md](docs/getting-started.md) | Install, link, run, two worked examples, troubleshooting |
 | [docs/concepts.md](docs/concepts.md) | Roles, models, pipelines, loops, memory, state, teams |
 | [docs/configuration.md](docs/configuration.md) | Every key of `harness.config.yaml` |
 | [docs/cli.md](docs/cli.md) | Full command reference |
@@ -247,4 +260,42 @@ src/
   init/apply.ts          rewriting scaffolded YAML, comments preserved
   commands/              one file per CLI command
 template/                what `harness init` copies
+docs/                    the documentation linked above
 ```
+
+---
+
+## Project status
+
+Early but working end to end. What has actually been exercised, and what has not:
+
+| Area | State |
+|---|---|
+| `init` / `sync` / `validate` / `doctor` | verified, including local-endpoint discovery |
+| Pipelines, DAG, loops, placeholders, resume | verified against a local open-weight model |
+| Tracing: manifest, `events.jsonl`, `report` | verified |
+| Memory, state, teams | verified |
+| `eval` (worktree isolation, assertions, baseline) | implemented, not yet run end to end |
+| `improve --apply --eval` | implemented, not yet run end to end |
+| agent-browser skill install | **unverified** — `setup.sh` discovers rather than assumes; see [docs/sandbox.md](docs/sandbox.md) |
+
+No test suite yet. `bun run typecheck` is the only automated gate; the fastest useful check
+on a change is `harness validate && harness pipeline run smoke`.
+
+## Contributing
+
+Issues and pull requests welcome at
+[Tlahey/hardess](https://github.com/Tlahey/hardess/issues).
+
+Two conventions worth knowing before you open one:
+
+- **Generated files are not edited by hand.** `opencode.json`, `.opencode/prompt/` and
+  `.harness/schema/` come from `roles/*.yaml` and the zod schemas. Change the source, run
+  `harness sync` (and `bun run schemas` when the schemas themselves change).
+- **Prompt changes want evidence.** The same rule the `improver` role follows applies to
+  humans: a prompt edit is easier to accept with a trace or an eval score behind it.
+
+## License
+
+MIT — see [LICENSE](LICENSE). The `template/` directory is meant to be copied into your own
+projects and carries no attribution requirement in practice.
