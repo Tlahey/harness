@@ -1,0 +1,226 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"
+          },
+          "description": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean",
+            "default": true
+          },
+          "default": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      },
+      "default": []
+    },
+    "concurrency": {
+      "type": "integer",
+      "exclusiveMinimum": 0
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]*$"
+              },
+              "needs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9][a-z0-9-]*$"
+                },
+                "default": []
+              },
+              "loop": {
+                "type": "object",
+                "properties": {
+                  "until": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "check": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9][a-z0-9-]*$"
+                  },
+                  "max": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 20,
+                    "default": 3
+                  },
+                  "onExhausted": {
+                    "type": "string",
+                    "enum": [
+                      "fail",
+                      "continue"
+                    ],
+                    "default": "fail"
+                  },
+                  "body": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^[a-z0-9][a-z0-9-]*$"
+                        },
+                        "role": {
+                          "type": "string",
+                          "pattern": "^[a-z0-9][a-z0-9-]*$"
+                        },
+                        "prompt": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "needs": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9][a-z0-9-]*$"
+                          },
+                          "default": []
+                        },
+                        "model": {
+                          "type": "string"
+                        },
+                        "continueSession": {
+                          "type": "boolean",
+                          "default": false
+                        },
+                        "outputs": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "default": []
+                        },
+                        "timeoutMs": {
+                          "type": "integer",
+                          "exclusiveMinimum": 0
+                        },
+                        "retry": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 5,
+                          "default": 0
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "prompt"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "until",
+                  "body"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "loop"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]*$"
+              },
+              "role": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]*$"
+              },
+              "prompt": {
+                "type": "string",
+                "minLength": 1
+              },
+              "needs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9][a-z0-9-]*$"
+                },
+                "default": []
+              },
+              "model": {
+                "type": "string"
+              },
+              "continueSession": {
+                "type": "boolean",
+                "default": false
+              },
+              "outputs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              },
+              "timeoutMs": {
+                "type": "integer",
+                "exclusiveMinimum": 0
+              },
+              "retry": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 5,
+                "default": 0
+              }
+            },
+            "required": [
+              "id",
+              "role",
+              "prompt"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "steps"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Harness pipeline",
+  "description": "A DAG of steps, optionally containing loops, run by `harness pipeline run`."
+}

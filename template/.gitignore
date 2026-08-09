@@ -1,0 +1,17 @@
+node_modules/
+dist/
+
+# Execution traces: regenerated on every run.
+.harness/runs/
+.harness/evals/
+.harness/improve/
+.harness/evals.jsonl
+.harness/improve.jsonl
+
+# Do commit, though:
+#   .harness/schema/      JSON schemas backing the editor `$schema` modelines
+#   .harness/sync.json    fingerprints of generated files (drift detection, CI)
+#   .harness/baseline.json  reference eval scores
+#   .harness/state.json   state shared across runs
+#   opencode.json         generated opencode configuration
+#   .opencode/prompt/     generated system prompts

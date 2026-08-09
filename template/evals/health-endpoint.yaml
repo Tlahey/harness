@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=../.harness/schema/eval.json
+#
+# An eval is one scenario replayed end to end in an isolated git worktree, then scored.
+# This file is an example: replace the task and the assertions with your own.
+# Without evals, `harness improve` has nothing to measure and is just an opinion generator.
+description: Can the pipeline deliver a trivial endpoint — designed, tested and approved?
+
+pipeline: feature
+
+inputs:
+  task: >-
+    Add an HTTP GET /health endpoint returning {"status":"ok"} with a 200 status code,
+    and the matching test.
+
+assert:
+  # Did the architect honour its contract?
+  - type: file_exists
+    path: docs/design/latest.md
+    description: the design was actually written
+
+  # Did the reviewer end up approving? That is the loop's exit condition.
+  - type: step_output
+    step: review
+    pattern: "VERDICT:\\s*approved"
+    description: the review ends on an approval
+
+  # Adapt this command to your project (npm test, pytest, cargo test…).
+  - type: command
+    run: bun test
+    expectExit: 0
+    description: the test suite passes
+    weight: 2
+
+  # The only check that looks at real behaviour rather than at artefacts.
+  - type: judge
+    role: judge
+    weight: 2
+    prompt: |
+      Verify that a GET /health endpoint really exists in this repository and returns a
+      200 status with a JSON body containing {"status":"ok"}.
+
+      Read the code, and run it if the project allows. Do not trust any agent report.
+      Answer with your verdict format.

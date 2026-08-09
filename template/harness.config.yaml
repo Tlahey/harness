@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=./.harness/schema/config.json
+#
+# Harness configuration.
+# Everything the roles share lives here; a role only declares what makes it different.
+
+project:
+  name: my-app
+  description: Application developed by the agent harness.
+
+defaults:
+  # Any role without an explicit `model:` inherits this one.
+  model: default
+  temperature: 0.2
+  permission:
+    edit: allow
+    # `ask` is fine when you drive opencode by hand, but it blocks a headless run:
+    # pipeline roles override it explicitly.
+    bash: ask
+    webfetch: allow
+
+# Aliases, so swapping a model everywhere stays a one-line change.
+# `harness init` rewrites this block from your answers; edit it freely afterwards.
+# `opencode models` lists the ids your providers actually expose.
+models:
+  default: anthropic/claude-sonnet-4-5
+  # Add an alias here, then point a single role at it (model: deep) to customise only
+  # what is worth customising:
+  # deep: anthropic/claude-opus-4-5
+  # local: ollama/qwen3-coder:30b
+
+paths:
+  roles: ./roles
+  pipelines: ./pipelines
+  evals: ./evals
+  memory: ./memory
+  artifacts: ./.harness/runs
+  state: ./.harness/state.json
+  prompts: ./.opencode/prompt
+  opencodeConfig: ./opencode.json
+
+opencode:
+  binary: opencode
+  # Appended to every `opencode run` invocation.
+  args: []
+  env: {}
+
+# Project memory: markdown files, read and written by the agents themselves.
+memory:
+  enabled: true
+  index: MEMORY.md
+  # Past this, `harness memory` asks you to merge entries: a memory nobody reads is
+  # not a memory.
+  maxEntries: 50
+
+# Self-improvement: who may rewrite what, and under which condition.
+improve:
+  role: improver
+  scope:
+    - roles/
+    - memory/
+  # Refuses to "improve" without a measurement to compare against. Setting this to false
+  # means accepting prompt changes you cannot evaluate.
+  requireBaseline: true
+
+# Project-wide instruction files, handed to every opencode session.
+instructions:
+  - docs/conventions.md
+  - memory/MEMORY.md
+
+# Custom providers (Ollama, LM Studio, vLLM…), passed through verbatim to opencode.json.
+provider: {}
+
+# MCP servers, passed through verbatim to opencode.json.
+mcp: {}
+
+run:
+  # How many steps of a pipeline may run at the same time.
+  concurrency: 2
+  # 30 minutes per step.
+  timeoutMs: 1800000

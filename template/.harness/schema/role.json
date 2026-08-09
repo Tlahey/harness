@@ -1,0 +1,128 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model": {
+      "type": "string"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "primary",
+        "subagent",
+        "all"
+      ],
+      "default": "all"
+    },
+    "temperature": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 2
+    },
+    "tools": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "permission": {
+      "type": "object",
+      "properties": {
+        "edit": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "ask",
+            "deny"
+          ]
+        },
+        "webfetch": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "ask",
+            "deny"
+          ]
+        },
+        "bash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "allow",
+                "ask",
+                "deny"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "enum": [
+                  "allow",
+                  "ask",
+                  "deny"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "instructions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "prompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "team": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      },
+      "default": []
+    },
+    "memory": {
+      "type": "string",
+      "enum": [
+        "none",
+        "read",
+        "write"
+      ],
+      "default": "read"
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "description",
+    "prompt"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Harness role",
+  "description": "One agent: its prompt, model, tools, permissions and team."
+}

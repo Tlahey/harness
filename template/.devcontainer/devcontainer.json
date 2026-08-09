@@ -1,0 +1,37 @@
+{
+  "name": "harness",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  // NET_ADMIN/NET_RAW are only needed by `.devcontainer/firewall.sh` (network allowlist).
+  // host-gateway makes a model server running on the host reachable from here.
+  "runArgs": ["--cap-add=NET_ADMIN", "--cap-add=NET_RAW", "--add-host=host.docker.internal:host-gateway"],
+
+  "containerEnv": {
+    "HARNESS_SANDBOX": "1",
+    "PLAYWRIGHT_BROWSERS_PATH": "/home/node/.cache/ms-playwright"
+  },
+
+  // Named volumes: opencode credentials and caches survive a container rebuild.
+  "mounts": [
+    "source=harness-opencode-data,target=/home/node/.local/share/opencode,type=volume",
+    "source=harness-opencode-config,target=/home/node/.config/opencode,type=volume",
+    "source=harness-playwright,target=/home/node/.cache/ms-playwright,type=volume"
+  ],
+
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "remoteUser": "node",
+  "updateRemoteUserUID": true,
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["redhat.vscode-yaml", "oven.bun"],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

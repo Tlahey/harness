@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=../.harness/schema/pipeline.json
+description: From a feature request to designed, implemented, reviewed, tested and fixed code.
+
+inputs:
+  - name: task
+    description: The feature to build, in one or two sentences.
+    required: true
+
+concurrency: 2
+
+steps:
+  - id: design
+    role: architect
+    outputs:
+      - docs/design/latest.md
+    prompt: |
+      Feature request:
+      {{ input.task }}
+
+      Produce the technical design and write it to docs/design/latest.md.
+      Overwrite the previous one; that file always holds the current design.
+
+  - id: implement
+    role: developer
+    needs: [design]
+    prompt: |
+      Implement the design in docs/design/latest.md.
+
+      The architect summarised the work as follows:
+      ---
+      {{ steps.design.output }}
+      ---
+
+      Run the build and the existing tests before you finish.
+
+  # Review, test and fix, repeated until the reviewer approves.
+  - id: verify
+    needs: [implement]
+    loop:
+      until: "VERDICT:\\s*approved"
+      check: review
+      max: 3
+      onExhausted: fail
+      body:
+        - id: review
+          role: reviewer
+          prompt: |
+            Iteration {{ loop.iteration }} of {{ loop.max }}.
+
+            Review the uncommitted changes in the working tree, which implement
+            docs/design/latest.md for this request:
+            {{ input.task }}
+
+            Write your report to {{ run.dir }}/review-{{ loop.iteration }}.md and print it
+            in your final message.
+
+        - id: test
+          role: tester
+          prompt: |
+            Write and run tests for the feature described in docs/design/latest.md, then
+            report the real output.
+
+            Write your report to {{ run.dir }}/tests-{{ loop.iteration }}.md.
+
+        - id: fix
+          role: developer
+          prompt: |
+            Two reports were just produced about your implementation:
+            - review: {{ steps.review.file }}
+            - tests:  {{ steps.test.file }}
+
+            Read both files. Fix every confirmed defect, re-run the tests, and list in your
+            final message what you fixed and what you disagree with (with a reason). If
+            both reports are clean, change nothing and say so.

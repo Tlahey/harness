@@ -1,0 +1,249 @@
+{
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "temperature": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "tools": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        },
+        "permission": {
+          "type": "object",
+          "properties": {
+            "edit": {
+              "type": "string",
+              "enum": [
+                "allow",
+                "ask",
+                "deny"
+              ]
+            },
+            "webfetch": {
+              "type": "string",
+              "enum": [
+                "allow",
+                "ask",
+                "deny"
+              ]
+            },
+            "bash": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "allow",
+                    "ask",
+                    "deny"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string",
+                    "enum": [
+                      "allow",
+                      "ask",
+                      "deny"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "model"
+      ],
+      "additionalProperties": false
+    },
+    "models": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {}
+    },
+    "paths": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "string",
+          "default": "./roles"
+        },
+        "pipelines": {
+          "type": "string",
+          "default": "./pipelines"
+        },
+        "evals": {
+          "type": "string",
+          "default": "./evals"
+        },
+        "artifacts": {
+          "type": "string",
+          "default": "./.harness/runs"
+        },
+        "prompts": {
+          "type": "string",
+          "default": "./.opencode/prompt"
+        },
+        "opencodeConfig": {
+          "type": "string",
+          "default": "./opencode.json"
+        },
+        "memory": {
+          "type": "string",
+          "default": "./memory"
+        },
+        "state": {
+          "type": "string",
+          "default": "./.harness/state.json"
+        }
+      },
+      "additionalProperties": false,
+      "default": {}
+    },
+    "opencode": {
+      "type": "object",
+      "properties": {
+        "binary": {
+          "type": "string",
+          "default": "opencode"
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        }
+      },
+      "additionalProperties": false,
+      "default": {}
+    },
+    "memory": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "index": {
+          "type": "string",
+          "default": "MEMORY.md"
+        },
+        "maxEntries": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "default": 50
+        }
+      },
+      "additionalProperties": false,
+      "default": {}
+    },
+    "improve": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "default": "improver"
+        },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "roles/",
+            "memory/"
+          ]
+        },
+        "requireBaseline": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": false,
+      "default": {}
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": {},
+      "default": {}
+    },
+    "mcp": {
+      "type": "object",
+      "additionalProperties": {},
+      "default": {}
+    },
+    "instructions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "run": {
+      "type": "object",
+      "properties": {
+        "concurrency": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "default": 2
+        },
+        "timeoutMs": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "default": 1800000
+        }
+      },
+      "additionalProperties": false,
+      "default": {}
+    }
+  },
+  "required": [
+    "project",
+    "defaults"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Harness configuration",
+  "description": "Project-wide settings shared by every role and pipeline."
+}

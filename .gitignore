@@ -1,0 +1,10 @@
+node_modules/
+dist/
+
+# Local tooling state, not project configuration.
+.claude/
+
+# Run traces produced when the harness is used on itself.
+.harness/runs/
+.harness/evals/
+.harness/improve/
