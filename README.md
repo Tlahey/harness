@@ -225,6 +225,7 @@ catches "server not running" and "model unloaded" before a run burns ten minutes
 | Document | Contents |
 |---|---|
 | [docs/getting-started.md](docs/getting-started.md) | Install, link, run, two worked examples, troubleshooting |
+| [docs/example-project.md](docs/example-project.md) | Full walkthrough: a real API set up with harness, end to end |
 | [docs/concepts.md](docs/concepts.md) | Roles, models, pipelines, loops, memory, state, teams |
 | [docs/configuration.md](docs/configuration.md) | Every key of `harness.config.yaml` |
 | [docs/cli.md](docs/cli.md) | Full command reference |

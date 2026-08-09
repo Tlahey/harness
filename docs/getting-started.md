@@ -298,6 +298,16 @@ Then make it yours:
 Commit the generated `opencode.json` and `.opencode/prompt/`: your teammates then get the
 same agents in their opencode, with or without the harness.
 
+> One gotcha: `init` skips files that already exist, **including `.gitignore`** — so the
+> harness rules are not added to yours. Append them by hand:
+>
+> ```bash
+> printf '\n# harness\n.harness/runs/\n.harness/evals/\n.harness/improve/\n' >> .gitignore
+> ```
+
+[example-project.md](example-project.md) walks through this on a real codebase — skeleton,
+conventions, a project-specific eval, then the improve loop.
+
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
