@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=../.harness/schema/pipeline.json
+#
+# Greenfield: turn a brief into a working skeleton. Run this once, on an empty or
+# nearly-empty repository, before using the `feature` pipeline.
+description: "Turn a project brief into a skeleton: stack, layout, tooling, one green test."
+
+inputs:
+  - name: brief
+    description: What the project is, in a few sentences. Name the stack if you care about it.
+    required: true
+
+steps:
+  - id: plan
+    role: architect
+    outputs:
+      - AGENTS.md
+      - docs/design/latest.md
+    prompt: |
+      This repository is empty, or close to it. Turn this brief into the foundations every
+      later run will build on:
+
+      {{ input.brief }}
+
+      Write two files.
+
+      1. `AGENTS.md` — the conventions every agent reads on every call. Stack, package
+         manager, test command, build command, directory layout, and the handful of rules
+         that close off decisions you do not want re-litigated. Short and decisive: it is
+         paid for on every single call.
+
+      2. `docs/design/latest.md` — the skeleton itself: the files to create, the entry
+         point, the shape of the first test, and the one feature that proves the thing
+         runs.
+
+      Decide. Do not present options and do not ask: where the brief leaves a choice open,
+      close it and state the assumption at the top of the design. Prefer the smallest stack
+      that does the job, and no dependency you cannot justify in one line.
+
+  - id: scaffold
+    role: developer
+    needs: [plan]
+    prompt: |
+      Create the project described in `docs/design/latest.md`, following `AGENTS.md`.
+
+      The architect's plan:
+      ---
+      {{ steps.plan.output }}
+      ---
+
+      Definition of done, in this order:
+      1. the project installs;
+      2. the build or typecheck command from AGENTS.md passes;
+      3. one real test passes — not a placeholder asserting `true`;
+      4. `git status` shows only files the design asked for.
+
+      Write the test the way the rest of the project should imitate: it is the example
+      every later run will copy.
+
+  - id: verify
+    role: tester
+    needs: [scaffold]
+    prompt: |
+      Verify the skeleton is real, not just plausible.
+
+      Run the commands `AGENTS.md` documents — install, build or typecheck, tests — and
+      report their actual output. If a command in AGENTS.md does not exist or does not
+      work, that is the finding: the conventions and the code disagree, and every later
+      run would inherit it.
+
+      Do not fix anything. Report.

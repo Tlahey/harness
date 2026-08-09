@@ -193,6 +193,12 @@ sandbox. The real protection is the git diff and the automatic rollback — whic
 Seven roles ship with the template: `lead` (delegates), `architect`, `developer`,
 `reviewer`, `tester`, `judge` (scores evals), `improver` (fixes prompts).
 
+Two pipelines, for the two ways in. On an empty repository, `bootstrap` turns a brief into
+a skeleton — the architect writes `AGENTS.md` and the design, the developer scaffolds, the
+tester checks the documented commands actually work. On an existing codebase, `feature`
+picks up the shape that is already there. Either way the agents need to know what shape you
+want: from your code, or from `AGENTS.md`, which opencode reads on its own.
+
 ---
 
 ## Models, including local ones

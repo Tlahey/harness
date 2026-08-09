@@ -7,7 +7,7 @@ Every command below was run for real. Where an agent's output would appear, it i
 *illustrative*: the shape is right, the wording depends on your model.
 
 - [The project](#the-project)
-- [Step 1 — build a skeleton first](#step-1--build-a-skeleton-first)
+- [Step 1 — establish the shape](#step-1--establish-the-shape)
 - [Step 2 — install harness into it](#step-2--install-harness-into-it)
 - [Step 3 — tell the agents about the project](#step-3--tell-the-agents-about-the-project)
 - [Step 4 — write an eval that means something](#step-4--write-an-eval-that-means-something)
@@ -34,11 +34,55 @@ GET  /health                    ->  200 {"status": "ok"}
 Stack: TypeScript on Bun, `bun:sqlite`, `bun test`. No dependencies, so the eval's
 `bun test` assertion works out of the box.
 
-## Step 1 — build a skeleton first
+## Step 1 — establish the shape
 
-**Do not point agents at an empty directory.** They will invent a structure, and every
-later run will inherit it. Fifteen minutes of skeleton buys you conventions the agents can
-match: a working test command, one file that shows the shape you want, and a green build.
+Agents do not need you to write code. They need to know **what shape you want** — and that
+knowledge comes from one of two places: existing code, or a written spec. If neither
+exists, the first run invents a structure and every later run inherits it.
+
+So there are two ways in, and both are legitimate:
+
+| | Greenfield | Existing project |
+|---|---|---|
+| Where the shape comes from | `AGENTS.md`, written from your brief | the code that is already there |
+| First command | `harness pipeline run bootstrap` | `harness init .` |
+| You write | a few sentences | nothing |
+
+### Greenfield: let the harness build the base
+
+The `bootstrap` pipeline exists for exactly this. It plans, scaffolds and verifies:
+
+```bash
+mkdir linkshort && cd linkshort && git init -b main
+harness init . --provider ollama --model ollama/qwen3-coder:30b --yes
+harness sync
+
+harness pipeline run bootstrap --input brief="\
+A URL shortener API. POST /links takes a url and returns a slug; GET /<slug> redirects.
+TypeScript on Bun, bun:sqlite for storage, bun test. No web framework."
+```
+
+Three steps, and note who does what:
+
+| Step | Role | Produces |
+|---|---|---|
+| plan | architect | `AGENTS.md` — stack, commands, layout, rules — and `docs/design/latest.md` |
+| scaffold | developer | the project: it installs, it builds, one real test passes |
+| verify | tester | runs the commands `AGENTS.md` claims exist, and reports the truth |
+
+That last step is the one that earns its keep: it catches the classic failure where the
+conventions file documents `npm test` and the project only answers to `bun test`. Left
+alone, every later run inherits the contradiction.
+
+Then read what it decided, and edit `AGENTS.md` until it says what you want. **This is the
+one file worth your own hands** — it is read on every call by every role, so a wrong line
+in it is paid for hundreds of times.
+
+The rest of this walkthrough uses the same project written by hand, so the code is in front
+of you rather than in a transcript. If you ran `bootstrap`, skip to
+[step 2](#step-2--install-harness-into-it) — you already have the equivalent.
+
+### By hand
 
 ```bash
 mkdir linkshort && cd linkshort
@@ -168,12 +212,15 @@ project:
 
 ## Step 3 — tell the agents about the project
 
-`docs/conventions.md` is handed to **every role on every call**. It is the highest-leverage
-file in the whole setup, and the one most people leave as the placeholder. Keep it short
-and true:
+`AGENTS.md` is read by **every role on every call**. opencode loads it from the project
+root by itself, so it also applies when you use opencode without the harness — and to any
+other tool that follows the AGENTS.md convention.
+
+It is the highest-leverage file in the whole setup, and the one most people leave as the
+placeholder. If you ran `bootstrap`, the architect already wrote it; edit it. Otherwise:
 
 ````markdown
-# Project conventions
+# AGENTS.md
 
 ## Stack
 
@@ -205,7 +252,7 @@ add a router" and "do not start a server in tests" exist because a capable model
 otherwise do both, reasonably, and leave you with a codebase you did not choose.
 
 The shipped roles need no change for this project — `bun test` is discovered from
-conventions, and the reviewer already reads `git diff`. Adjust `roles/*.yaml` only when a
+`AGENTS.md`, and the reviewer already reads `git diff`. Adjust `roles/*.yaml` only when a
 role misbehaves, and prefer doing it with a trace in hand (see [evaluation.md](evaluation.md)).
 
 ## Step 4 — write an eval that means something
@@ -413,12 +460,13 @@ linkshort/
 │   ├── db.ts
 │   ├── server.ts
 │   └── server.test.ts
-├── docs/
-│   ├── conventions.md        given to every role, every call
-│   └── design/latest.md      written by the architect each run
+├── AGENTS.md                 read by every role, every call — and by bare opencode
+├── docs/design/latest.md     written by the architect each run
 ├── roles/*.yaml              7 roles: lead, architect, developer, reviewer,
 │                             tester, judge, improver
-├── pipelines/feature.yaml    design → implement → (review ∥ test → fix)*
+├── pipelines/
+│   ├── bootstrap.yaml        greenfield: plan → scaffold → verify
+│   └── feature.yaml          design → implement → (review ∥ test → fix)*
 ├── evals/create-link.yaml    the scenario you are scored on
 ├── memory/                   what the project has learned
 ├── opencode.json             generated — commit it
@@ -436,10 +484,10 @@ repo gets the same seven agents in their own opencode, harness or not.
 
 ## Adapting to another stack
 
-The only project-specific parts are `docs/conventions.md` and the `command` assertions in
-your evals. Everything else is stack-agnostic.
+The only project-specific parts are `AGENTS.md` and the `command` assertions in your evals.
+Everything else is stack-agnostic.
 
-| Stack | conventions: test command | eval assertion |
+| Stack | AGENTS.md test command | eval assertion |
 |---|---|---|
 | Bun | `bun test` | `run: bun test` |
 | Node + pnpm | `pnpm test` | `run: pnpm test` |
@@ -449,8 +497,8 @@ your evals. Everything else is stack-agnostic.
 
 Two adjustments worth making early on a larger codebase:
 
-- **Point the architect at the right subtree.** Add a `Layout` section to conventions
-  naming the directories that matter, or the design step will explore for minutes before
+- **Point the architect at the right subtree.** Name the directories that matter in the
+  `Layout` section of `AGENTS.md`, or the design step will explore for minutes before
   writing anything.
 - **Raise `run.timeoutMs`** if your build is slow. The default is 30 minutes per step;
   a step that dies mid-build leaves a half-applied change.

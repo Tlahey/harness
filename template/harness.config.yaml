@@ -62,9 +62,10 @@ improve:
   # means accepting prompt changes you cannot evaluate.
   requireBaseline: true
 
-# Project-wide instruction files, handed to every opencode session.
+# Extra instruction files, merged into every opencode session.
+# AGENTS.md is NOT listed here: opencode loads it from the project root on its own, and
+# listing it would send it twice.
 instructions:
-  - docs/conventions.md
   - memory/MEMORY.md
 
 # Custom providers (Ollama, LM Studio, vLLM…), passed through verbatim to opencode.json.

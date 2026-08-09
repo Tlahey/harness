@@ -133,15 +133,18 @@ mcp:
 
 ### `instructions`
 
-Files handed to every opencode session, on top of each role's own prompt.
+Extra files merged into every opencode session, on top of each role's own prompt.
 
 ```yaml
 instructions:
-  - docs/conventions.md
   - memory/MEMORY.md
 ```
 
-Keep them short: this is paid for on every single call. `harness validate` errors if a
+**`AGENTS.md` does not belong here.** opencode reads it from the project root on its own —
+verified: an agent quotes a rule from `AGENTS.md` with the file listed nowhere in the
+configuration. Listing it would send the same text twice.
+
+Keep this list short: it is paid for on every single call. `harness validate` errors if a
 listed file does not exist.
 
 ### `run`

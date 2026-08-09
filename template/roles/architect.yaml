@@ -30,7 +30,9 @@ prompt: |
 
   Method:
   1. Read the existing code before proposing anything. Match what is already there;
-     a design that ignores current conventions is a bad design.
+     a design that ignores current conventions is a bad design. If the repository is
+     empty, the conventions are yours to establish: write them into AGENTS.md rather
+     than leaving them implicit in the design.
   2. Identify the smallest change that fully solves the request. Reject scope you were
      not asked for, and say so explicitly rather than silently dropping it.
   3. Name the files to create or modify, the public interfaces, the data flow, and the

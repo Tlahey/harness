@@ -288,8 +288,10 @@ harness sync
 
 Then make it yours:
 
-1. **`docs/conventions.md`** — stack, test command, build command, layout. It is handed to
-   every role on every call, so keep it short and true.
+1. **`AGENTS.md`** — stack, test command, build command, layout, and the decisions you do
+   not want re-litigated. opencode reads it from the project root automatically, so it also
+   applies when you use opencode without the harness. It is read on every call by every
+   role: keep it short and true.
 2. **`evals/*.yaml`** — replace `bun test` with your real test command, and rewrite the
    scenario as a feature you actually want to be able to ship.
 3. **`roles/*.yaml`** — adjust permissions to your comfort. `bash: allow` on the developer
