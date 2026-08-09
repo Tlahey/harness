@@ -5,7 +5,7 @@ A project template for building software with **opencode**, driven by declarativ
 evaluation, and a self-improvement loop that is actually measured.
 
 ```bash
-git clone git@github.com:Tlahey/hardess.git && cd hardess
+git clone git@github.com:Tlahey/harness.git && cd harness
 bun install
 bun link                      # `harness` becomes available everywhere
 
@@ -286,7 +286,7 @@ on a change is `harness validate && harness pipeline run smoke`.
 ## Contributing
 
 Issues and pull requests welcome at
-[Tlahey/hardess](https://github.com/Tlahey/hardess/issues).
+[Tlahey/harness](https://github.com/Tlahey/harness/issues).
 
 Two conventions worth knowing before you open one:
 

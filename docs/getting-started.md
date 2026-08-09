@@ -32,8 +32,8 @@ see [sandbox.md](sandbox.md).
 ## Install
 
 ```bash
-git clone git@github.com:Tlahey/hardess.git
-cd hardess
+git clone git@github.com:Tlahey/harness.git
+cd harness
 bun install
 bun run typecheck    # optional, ~2s
 ```

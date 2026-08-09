@@ -19,13 +19,13 @@
     "bun",
     "typescript"
   ],
-  "homepage": "https://github.com/Tlahey/hardess#readme",
+  "homepage": "https://github.com/Tlahey/harness#readme",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/Tlahey/hardess.git"
+    "url": "git+ssh://git@github.com/Tlahey/harness.git"
   },
   "bugs": {
-    "url": "https://github.com/Tlahey/hardess/issues"
+    "url": "https://github.com/Tlahey/harness/issues"
   },
   "license": "MIT",
   "author": "Antoine Vendeville",
