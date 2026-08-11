@@ -15,6 +15,9 @@ steps:
     outputs:
       - AGENTS.md
       - docs/design/latest.md
+    # A bootstrap plan is long-form writing; on a small local model it can outlast the
+    # 30-minute default and die with its work half-done.
+    timeoutMs: 3600000
     prompt: |
       This repository is empty, or close to it. Turn this brief into the foundations every
       later run will build on:
@@ -31,6 +34,10 @@ steps:
       2. `docs/design/latest.md` — the skeleton itself: the files to create, the entry
          point, the shape of the first test, and the one feature that proves the thing
          runs.
+
+      Write those two files and stop. Nothing else — no source code, no test, no memory
+      entry, no README. The next steps do that, and a plan step that keeps going is a plan
+      step that gets killed halfway through.
 
       Decide. Do not present options and do not ask: where the brief leaves a choice open,
       close it and state the assumption at the top of the design. Prefer the smallest stack

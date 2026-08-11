@@ -48,9 +48,10 @@ So there are two ways in, and both are legitimate:
 | First command | `harness pipeline run bootstrap` | `harness init .` |
 | You write | a few sentences | nothing |
 
-### Greenfield: let the harness build the base
+### Greenfield: the harness builds the base
 
-The `bootstrap` pipeline exists for exactly this. It plans, scaffolds and verifies:
+You do not write the skeleton. The `bootstrap` pipeline plans it, scaffolds it and checks
+it actually runs:
 
 ```bash
 mkdir linkshort && cd linkshort && git init -b main
@@ -62,31 +63,61 @@ A URL shortener API. POST /links takes a url and returns a slug; GET /<slug> red
 TypeScript on Bun, bun:sqlite for storage, bun test. No web framework."
 ```
 
-Three steps, and note who does what:
-
 | Step | Role | Produces |
 |---|---|---|
 | plan | architect | `AGENTS.md` — stack, commands, layout, rules — and `docs/design/latest.md` |
 | scaffold | developer | the project: it installs, it builds, one real test passes |
 | verify | tester | runs the commands `AGENTS.md` claims exist, and reports the truth |
 
-That last step is the one that earns its keep: it catches the classic failure where the
-conventions file documents `npm test` and the project only answers to `bun test`. Left
+That last step is the one that earns its keep. It catches the classic failure where the
+conventions file documents `npm test` and the project only answers to `bun test` — left
 alone, every later run inherits the contradiction.
 
-Then read what it decided, and edit `AGENTS.md` until it says what you want. **This is the
-one file worth your own hands** — it is read on every call by every role, so a wrong line
-in it is paid for hundreds of times.
+Here is what the `plan` step really wrote from the brief above, on a local 8-bit
+Qwen3-Coder. `AGENTS.md`:
 
-The rest of this walkthrough uses the same project written by hand, so the code is in front
-of you rather than in a transcript. If you ran `bootstrap`, skip to
-[step 2](#step-2--install-harness-into-it) — you already have the equivalent.
+```markdown
+## Stack
+- Language: TypeScript (ESM, no JSX)
+- Package manager: Bun (bun:sqlite, bun:test built-in, no npm/yarn)
+- Test command: `bun test`
+- Build command: none (Bun runs TypeScript directly)
 
-### By hand
-
-```bash
-mkdir linkshort && cd linkshort
+## What good looks like
+- Routing lives in a single `handle()` function in `src/server.ts`. Add branches there;
+  do not add a router library.
+- Tests call handlers directly without starting a server.
+- Database connection is a singleton in `src/db.ts`. Tests use an in-memory database.
+- Slugs are 6-character URL-safe base62 strings. Do not use UUIDs or 雪花 IDs.
 ```
+
+and `docs/design/latest.md` opened with its assumptions, closed rather than asked:
+
+```markdown
+## Assumptions
+1. No framework routing — manual routing in a single `handle()` function
+2. Slugs are 6-character base62 — generated from crypto random bytes
+3. 301 redirects — permanent redirects for SEO friendliness
+4. In-memory SQLite for tests — faster, isolated between runs
+```
+
+**Read it, then fix it.** That is the one manual step worth your time: `AGENTS.md` is read
+on every call by every role, so a wrong line is paid for hundreds of times. In the run
+above there are two things to correct — a stray `雪花` from an 8-bit model, and a 301 that
+should probably be a 302 for a shortener you may want to re-point later. Neither is
+catastrophic; both would have propagated silently.
+
+> **On a small local model, budget time.** In that run the `plan` step ran past the
+> 30-minute default and was killed mid-write, leaving the design in place but the pipeline
+> failed. The shipped `bootstrap` now sets `timeoutMs: 3600000` on that step and tells the
+> architect to write the two files and stop. If you see `plan timed out`, raise it further
+> or use a faster model for that step: `--input` is not the only knob, `model:` on the step
+> works too.
+
+### The skeleton this page refers to
+
+Whether `bootstrap` wrote it or you did, the rest of this walkthrough talks about the code
+below. It is here so you can read it, not so you type it.
 
 `package.json`:
 
@@ -164,11 +195,11 @@ test("unknown slug is a 404", () => {
 });
 ```
 
-Then make it green and commit:
+Whatever produced it, commit before going further:
 
 ```bash
 bun test          # 2 pass, 0 fail
-git init -b main && git add -A && git commit -m "linkshort: health, slug redirect, tests"
+git add -A && git commit -m "linkshort: health, slug redirect, tests"
 ```
 
 The commit matters: evals run from HEAD, and `improve` rolls back with git.

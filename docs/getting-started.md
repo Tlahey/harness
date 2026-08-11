@@ -321,6 +321,7 @@ conventions, a project-specific eval, then the improve loop.
 | `opencode.json is stale` | roles changed since the last sync | `harness sync` |
 | `<file> was hand-edited and no longer matches its role` | you edited a generated file | edit the YAML instead, or `harness sync --force` |
 | `Cannot find module 'zod'` | dependencies not installed | `bun install` |
+| `<step> timed out` and the step is marked failed | the model is slower than `run.timeoutMs` (30 min default) | raise `run.timeoutMs`, set `timeoutMs:` on that step, or give the step a faster `model:` |
 | `harness eval` refuses to start | not a git repository | `git init`, or `--in-place` and accept the risk |
 | Editor errors like `Property mode is not allowed` | an unrelated YAML schema matched the file | `harness sync` regenerates `.harness/schema/`; the `$schema` modeline overrides the guess |
 | `Template not found at …/template` | running the compiled binary | scaffold from a repo checkout |

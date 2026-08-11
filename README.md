@@ -282,6 +282,7 @@ Early but working end to end. What has actually been exercised, and what has not
 | Pipelines, DAG, loops, placeholders, resume | verified against a local open-weight model |
 | Tracing: manifest, `events.jsonl`, `report` | verified |
 | Memory, state, teams | verified |
+| `bootstrap` pipeline | run for real; the `plan` step outlasted the 30-minute default on an 8-bit local model, which is why it now sets its own `timeoutMs` |
 | `eval` (worktree isolation, assertions, baseline) | implemented, not yet run end to end |
 | `improve --apply --eval` | implemented, not yet run end to end |
 | agent-browser skill install | **unverified** — `setup.sh` discovers rather than assumes; see [docs/sandbox.md](docs/sandbox.md) |
